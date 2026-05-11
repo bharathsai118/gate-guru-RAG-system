@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GATE Guru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="min-h-screen">
+      <section class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
+        <header class="app-shell px-5 py-5 sm:px-6">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div class="flex items-center gap-3">
+                <span class="brand-mark"><i data-lucide="graduation-cap"></i></span>
+                <h1 class="text-3xl font-semibold text-zinc-950 sm:text-4xl">GATE Guru</h1>
+              </div>
+              <p class="mt-2 text-sm font-medium text-zinc-600 sm:text-base">
+                Traditional RAG-based AI tutor for GATE CSE
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button id="indexButton" class="secondary-button" type="button">
+                <i data-lucide="database-zap"></i>
+                <span>Index Resources</span>
+              </button>
+              <a class="secondary-button" href="/health" target="_blank" rel="noreferrer">
+                <i data-lucide="activity"></i>
+                <span>Health</span>
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <section id="statusPanel" class="hidden status-panel" role="status"></section>
+
+        <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
+          <aside class="flex flex-col gap-6">
+            <section class="panel p-5">
+              <div class="section-title">
+                <i data-lucide="sliders-horizontal"></i>
+                <h2>Study Setup</h2>
+              </div>
+
+              <label class="field-label" for="subjectSelect">Subject</label>
+              <select id="subjectSelect" class="form-control"></select>
+
+              <label class="field-label mt-4" for="modeButtons">Mode</label>
+              <div id="modeButtons" class="segmented-control" role="group" aria-label="Study mode">
+                <button class="mode-button active" type="button" data-mode="ask">Ask</button>
+                <button class="mode-button" type="button" data-mode="solve">Solve</button>
+                <button class="mode-button" type="button" data-mode="revision">Revision</button>
+                <button class="mode-button" type="button" data-mode="quiz">Quiz</button>
+              </div>
+
+              <label class="mt-5 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3">
+                <input id="includeDa" class="checkbox-control mt-1" type="checkbox" />
+                <span>
+                  <span class="block text-sm font-semibold text-zinc-900">Include DA / AI / ML resources</span>
+                  <span class="block text-xs text-zinc-500">Adds the optional DA PDF to retrieval.</span>
+                </span>
+              </label>
+            </section>
+
+            <section class="panel p-5">
+              <div class="section-title">
+                <i data-lucide="upload-cloud"></i>
+                <h2>Upload PDF</h2>
+              </div>
+
+              <label class="field-label" for="uploadSubject">Subject group</label>
+              <select id="uploadSubject" class="form-control"></select>
+
+              <label class="upload-drop mt-4" for="pdfInput">
+                <i data-lucide="file-text"></i>
+                <span id="fileName">Choose a PDF</span>
+                <input id="pdfInput" type="file" accept="application/pdf,.pdf" />
+              </label>
+
+              <button id="uploadButton" class="primary-button mt-4 w-full" type="button">
+                <i data-lucide="cloud-upload"></i>
+                <span>Upload and Index</span>
+              </button>
+              <div id="uploadStatus" class="mt-3 text-sm text-zinc-600"></div>
+            </section>
+          </aside>
+
+          <section class="panel flex min-h-[680px] flex-col p-5 sm:p-6">
+            <div class="section-title">
+              <i data-lucide="messages-square"></i>
+              <h2>Ask GATE Guru</h2>
+            </div>
+
+            <label class="field-label" for="questionInput">Question</label>
+            <textarea
+              id="questionInput"
+              class="question-box"
+              rows="6"
+              placeholder="Explain deadlock conditions in operating systems."
+            ></textarea>
+
+            <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div id="visitorBadge" class="visitor-badge"></div>
+              <button id="askButton" class="primary-button sm:min-w-40" type="button">
+                <i data-lucide="send"></i>
+                <span>Ask</span>
+              </button>
+            </div>
+
+            <div id="loadingIndicator" class="loading-row hidden">
+              <span class="spinner"></span>
+              <span>Retrieving context and generating answer...</span>
+            </div>
+
+            <div class="mt-6 grid gap-5 xl:grid-cols-[1fr_300px]">
+              <article class="answer-surface">
+                <div class="answer-header">
+                  <i data-lucide="sparkles"></i>
+                  <span>Answer</span>
+                </div>
+                <div id="answerOutput" class="answer-content">
+                  Ask from the preloaded GATE CSE resources or your uploaded PDFs.
+                </div>
+                <div id="feedbackPanel" class="feedback-panel hidden">
+                  <span>Was this answer useful?</span>
+                  <button class="feedback-button" type="button" data-rating="up" aria-label="Helpful answer">
+                    <i data-lucide="thumbs-up"></i>
+                  </button>
+                  <button class="feedback-button" type="button" data-rating="down" aria-label="Unhelpful answer">
+                    <i data-lucide="thumbs-down"></i>
+                  </button>
+                </div>
+              </article>
+
+              <aside class="sources-surface">
+                <div class="answer-header">
+                  <i data-lucide="quote"></i>
+                  <span>Sources</span>
+                </div>
+                <div id="sourcesOutput" class="sources-list">
+                  <div class="empty-source">No citations yet.</div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
