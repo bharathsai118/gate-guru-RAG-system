@@ -16,13 +16,9 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY requirements.txt .
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt
 
 RUN useradd -m -u 1000 appuser \
     && mkdir -p /data/chroma_db /data/uploads /data/feedback /data/history /data/.cache/huggingface /data/.cache/sentence_transformers \
