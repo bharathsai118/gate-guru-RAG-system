@@ -13,7 +13,10 @@ class Reranker:
         if self._model is None:
             from sentence_transformers import CrossEncoder
 
-            self._model = CrossEncoder(self.config.reranker_model_name)
+            self._model = CrossEncoder(
+                self.config.reranker_model_name,
+                max_length=self.config.reranker_max_length,
+            )
         return self._model
 
     def rerank(self, question: str, chunks: list[dict], top_n: int) -> list[dict]:
@@ -34,4 +37,3 @@ class Reranker:
         except Exception as exc:
             self.last_error = str(exc)
             return chunks[:top_n]
-

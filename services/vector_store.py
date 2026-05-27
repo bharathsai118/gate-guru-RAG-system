@@ -16,9 +16,13 @@ class VectorStore:
 
         try:
             import chromadb
+            from chromadb.config import Settings
 
             self.config.chroma_db_dir.mkdir(parents=True, exist_ok=True)
-            self.client = chromadb.PersistentClient(path=str(self.config.chroma_db_dir))
+            self.client = chromadb.PersistentClient(
+                path=str(self.config.chroma_db_dir),
+                settings=Settings(anonymized_telemetry=False),
+            )
             self.collection = self.client.get_or_create_collection(
                 name=self.config.collection_name
             )
@@ -221,4 +225,3 @@ class VectorStore:
                     merged[result["id"]] = result
 
         return sorted(merged.values(), key=lambda item: item["distance"])[:top_k]
-

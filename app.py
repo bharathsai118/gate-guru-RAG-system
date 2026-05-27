@@ -44,7 +44,12 @@ def _build_limiter(app: Flask):
     try:
         from flask_limiter import Limiter
 
-        return Limiter(key_func=_visitor_rate_key, app=app)
+        config: AppConfig = app.extensions["gate_guru_config"]
+        return Limiter(
+            key_func=_visitor_rate_key,
+            app=app,
+            storage_uri=config.rate_limit_storage_uri,
+        )
     except Exception as exc:
         app.logger.warning("Rate limiting disabled: %s", exc)
         return None
@@ -104,6 +109,7 @@ def create_app() -> Flask:
 
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = config.max_upload_bytes
+    app.extensions["gate_guru_config"] = config
     limiter = _build_limiter(app)
 
     vector_store = VectorStore(config)
@@ -115,7 +121,6 @@ def create_app() -> Flask:
     preloader = Preloader(config, vector_store)
     cleanup_scheduler = start_cleanup_scheduler(config, vector_store, app.logger)
 
-    app.extensions["gate_guru_config"] = config
     app.extensions["gate_guru_vector_store"] = vector_store
     app.extensions["gate_guru_preloader"] = preloader
     app.extensions["gate_guru_cleanup_scheduler"] = cleanup_scheduler

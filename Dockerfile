@@ -3,7 +3,6 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     HF_HOME=/data/.cache/huggingface \
-    TRANSFORMERS_CACHE=/data/.cache/huggingface \
     SENTENCE_TRANSFORMERS_HOME=/data/.cache/sentence_transformers \
     CHROMA_DB_DIR=/data/chroma_db \
     UPLOAD_DIR=/data/uploads \

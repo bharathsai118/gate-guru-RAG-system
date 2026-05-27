@@ -79,7 +79,19 @@ def split_text_into_token_chunks(
         return []
 
     tokenizer = _load_tokenizer(tokenizer_name)
-    token_ids = tokenizer.encode(text, add_special_tokens=False)
+    model_max_length = getattr(tokenizer, "model_max_length", None)
+    if isinstance(model_max_length, int) and model_max_length > 0 and model_max_length < 100_000:
+        chunk_size_tokens = min(chunk_size_tokens, max(1, model_max_length - 32))
+
+    encoded = tokenizer(
+        text,
+        add_special_tokens=False,
+        truncation=False,
+        return_attention_mask=False,
+        return_token_type_ids=False,
+        verbose=False,
+    )
+    token_ids = encoded["input_ids"]
     if not token_ids:
         return []
     if len(token_ids) <= chunk_size_tokens:

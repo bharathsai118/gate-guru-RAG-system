@@ -180,6 +180,7 @@ class AppConfig:
             "RERANKER_MODEL_NAME", "cross-encoder/ms-marco-MiniLM-L-6-v2"
         )
     )
+    reranker_max_length: int = field(default_factory=lambda: _env_int("RERANKER_MAX_LENGTH", 512))
     max_context_chunks: int = field(default_factory=lambda: _env_int("MAX_CONTEXT_CHUNKS", 5))
     max_new_tokens: int = field(default_factory=lambda: _env_int("MAX_NEW_TOKENS", 512))
     chunk_size: int = field(default_factory=lambda: _env_int("CHUNK_SIZE", 900))
@@ -209,6 +210,9 @@ class AppConfig:
         default_factory=lambda: os.getenv("UPLOAD_RATE_LIMIT", "8 per hour")
     )
     index_rate_limit: str = field(default_factory=lambda: os.getenv("INDEX_RATE_LIMIT", "3 per hour"))
+    rate_limit_storage_uri: str = field(
+        default_factory=lambda: os.getenv("RATELIMIT_STORAGE_URI", "memory://")
+    )
     feedback_log_file: Path = field(
         default_factory=lambda: _resolve_path(
             os.getenv("FEEDBACK_LOG_FILE"), BASE_DIR / "feedback" / "feedback.jsonl"
